@@ -1,4 +1,4 @@
-# Giantek Management System
+# Management System
 
 A full-stack **Employee & Client Management Portal** for **Giantek Consultancy Services**, built with a Node.js/Express backend and a React/Vite frontend.
 

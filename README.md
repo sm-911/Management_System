@@ -2,113 +2,130 @@
 
 A full-stack **Employee & Client Management Portal** for **Giantek Consultancy Services**, built with a Node.js/Express backend and a React/Vite frontend.
 
+> [!IMPORTANT]
+> **Production Notice & Data Privacy**  
+> This repository represents a proprietary solution configured for internal organizational use. The live production instance is strictly protected and connected to an isolated database. Direct access, production data, and live secrets are not exposed in this repository.
+
+---
+
 ## Features
 
-- 🔐 JWT-based authentication with role-based access (Admin / Employee)
+- 🔐 JWT-based authentication with role-based access control (Admin / Employee)
 - 👥 Employee management (CRUD, suspend/restore, password reset)
-- 🏢 Client management
-- 📋 Work entry tracking with lock/unlock workflow
-- 💰 Revenue recording and reporting (admin only)
-- 📊 Dashboard with charts (work trends, revenue, employee performance)
-- 📁 Audit log for all admin actions
-- 🔔 In-app notifications
+- 🏢 Client profile & engagement management
+- 📋 Work entry logging with lock/unlock status workflow
+- 💰 Revenue tracking and financial recording (restricted to Admin)
+- 📊 Interactive analytics dashboards (work trends, revenue metrics, team performance)
+- 📁 Comprehensive audit log for administrative actions
+- 🔔 Real-time in-app notifications
+
+---
 
 ## Tech Stack
 
-| Layer    | Technology                            |
-|----------|---------------------------------------|
-| Frontend | React 18, Vite, Recharts, React Icons |
-| Backend  | Node.js, Express                      |
-| Database | MySQL (hosted on Render / Aiven / etc.) |
-| Auth     | JWT + bcrypt                          |
-| Styling  | Vanilla CSS                           |
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 18, Vite, Recharts, React Icons, Axios |
+| **Backend** | Node.js, Express |
+| **Database** | MySQL (Render / Aiven / Local MySQL) |
+| **Auth** | JWT + bcrypt |
+| **Styling** | Modular Vanilla CSS |
 
 ---
 
-## Getting Started (Local Development)
+## Contributing & Modification Guidelines
+
+If you wish to test, inspect, or propose modifications to this project:
+
+1. **Do not attempt to modify production branches directly.**
+2. **Clone / Fork the Repository:** Clone the repository to your own personal workspace or fork it on GitHub.
+3. **Use Isolated Environments:** Set up your own local MySQL database and custom `.env` configuration. Never connect personal/test instances to production data stores.
+4. **Submitting Changes:**
+   - Create a dedicated feature branch (`git checkout -b feature/your-feature-name`).
+   - Test your changes thoroughly locally.
+   - Submit a **Pull Request (PR)** or open an **Issue** with a detailed summary and diff of the changes.
+   - The maintainer will review the code changes and verify compatibility before merging into the main codebase.
+
+---
+
+## Local Development Setup
 
 ### 1. Prerequisites
 - Node.js >= 18
-- A running MySQL server (local or cloud)
+- MySQL Server (Local instance, Docker container, or private cloud instance)
 
-### 2. Environment Variables
+### 2. Backend Configuration
 
-Create a `.env` file inside the `backend/` folder:
+1. Navigate to the `backend/` directory:
+   ```bash
+   cd backend
+   ```
+2. Copy the sample environment file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Update the `.env` file with your local credentials:
+   ```env
+   PORT=5000
+   MYSQL_URL=mysql://<USER>:<PASSWORD>@<HOST>:<PORT>/<DATABASE>
+   JWT_SECRET=your_custom_jwt_secret
+   FRONTEND_URL=http://localhost:5173
+   NODE_ENV=development
+   ```
+4. Install dependencies and start the backend:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   *The database schema and initial tables are automatically initialized on startup.*
 
-```env
-# Required
-MYSQL_URL=mysql://USER:PASSWORD@HOST:PORT/DATABASE
-JWT_SECRET=your_super_secret_key_here
+> [!NOTE]
+> **Initial Admin Setup:** When setting up a new database instance for the first time, check or customize your initial admin credentials in your configuration before first startup, and change passwords immediately after first login.
 
-# Optional — defaults to http://localhost:5173 if not set
-FRONTEND_URL=http://localhost:5173
-```
+### 3. Frontend Configuration
 
-> 💡 **Tip:** For local development you can use `MYSQL_URL=mysql://root:password@localhost:3306/giantek`
-
-### 3. Backend
-```bash
-cd backend
-npm install
-npm run dev
-# Runs on http://localhost:5000
-```
-The database tables and the default admin account are **automatically created** on first startup.
-
-### 4. Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-# Runs on http://localhost:5173
-```
-
-### Default Admin Login
-```
-Email:    admin@giantek.com
-Password: Admin@123
-```
+1. Navigate to the `frontend/` directory:
+   ```bash
+   cd frontend
+   ```
+2. Copy the sample environment file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Set your backend API URL in `.env`:
+   ```env
+   VITE_API_URL=http://localhost:5000
+   ```
+4. Install dependencies and start the Vite dev server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   *The frontend will run at `http://localhost:5173`.*
 
 ---
 
-## Deploying to Render.com
+## Deployment (Render.com)
 
-### Step 1 — Create a MySQL Database
-1. Go to [Render.com](https://render.com) → **New +** → **MySQL** (or use a free external provider like [Aiven.io](https://aiven.io)).
-2. Copy the **External Connection URL** (it looks like `mysql://user:pass@host:port/dbname`).
+### 1. Database
+- Deploy a MySQL instance via Render or an external managed MySQL provider (e.g., Aiven).
+- Obtain the external connection string: `mysql://<user>:<pass>@<host>:<port>/<dbname>`.
 
-### Step 2 — Deploy the Backend (Web Service)
-1. **New +** → **Web Service** → connect your GitHub repository.
-2. Set the following:
-   - **Root Directory:** `backend`
-   - **Build Command:** `npm install`
-   - **Start Command:** `node server.js`
-   - **Environment:** Node
-3. Under **Environment Variables**, add:
-   | Key | Value |
-   |-----|-------|
-   | `MYSQL_URL` | *(paste your MySQL connection URL from Step 1)* |
-   | `JWT_SECRET` | *(any strong random string)* |
-   | `FRONTEND_URL` | *(your Render frontend URL — add after Step 3)* |
-4. Click **Deploy**.
+### 2. Backend Web Service
+- **Root Directory:** `backend`
+- **Build Command:** `npm install`
+- **Start Command:** `node server.js`
+- **Environment Variables:**
+  - `MYSQL_URL`
+  - `JWT_SECRET`
+  - `FRONTEND_URL` (Set to your deployed frontend domain for CORS)
 
-### Step 3 — Deploy the Frontend (Static Site)
-1. **New +** → **Static Site** → connect the same GitHub repository.
-2. Set the following:
-   - **Root Directory:** `frontend`
-   - **Build Command:** `npm install && npm run build`
-   - **Publish Directory:** `dist`
-3. Under **Environment Variables**, add:
-   | Key | Value |
-   |-----|-------|
-   | `VITE_API_URL` | *(your Render backend URL from Step 2, e.g. `https://giantek-api.onrender.com`)* |
-4. Click **Deploy**.
-
-### Step 4 — Update CORS
-Go back to your backend Web Service → **Environment** tab and set:
-- `FRONTEND_URL` → your Render static site URL (e.g. `https://giantek.onrender.com`)
-
-Then redeploy the backend service.
+### 3. Frontend Static Site
+- **Root Directory:** `frontend`
+- **Build Command:** `npm install && npm run build`
+- **Publish Directory:** `dist`
+- **Environment Variables:**
+  - `VITE_API_URL` (Set to your deployed backend URL, e.g., `https://giantek-api.onrender.com`)
 
 ---
 
@@ -117,14 +134,23 @@ Then redeploy the backend service.
 ```
 giantek-portal/
 ├── backend/
-│   ├── db/           # MySQL connection pool, schema creation & seeding
-│   ├── middleware/   # Auth guard, role checks, audit logger
-│   ├── routes/       # API routes (auth, employees, clients, work, revenue, reports, audit, notifications)
-│   └── server.js
+│   ├── .env.example      # Sample backend environment configuration
+│   ├── db/               # MySQL connection pool, table definitions & migrations
+│   ├── middleware/       # JWT auth guards, role checks, audit logger
+│   ├── routes/           # REST endpoints (auth, employees, clients, work, revenue, etc.)
+│   └── server.js         # Express app entrypoint & lifecycle handlers
 └── frontend/
+    ├── .env.example      # Sample frontend environment configuration
     └── src/
-        ├── pages/        # Login, AdminDashboard, Employees, Clients, WorkEntries, Revenue, Reports, AuditLog
-        ├── components/
-        ├── context/      # AuthContext
-        └── services/     # Axios instance (api.js)
+        ├── api/          # Axios HTTP client instance & interceptors
+        ├── components/   # Reusable UI components, modals & layout
+        ├── context/      # Authentication & theme context providers
+        ├── pages/        # Route views (Dashboard, Employees, Clients, Work, etc.)
+        └── utils/        # Date formatting and helper utilities
 ```
+
+---
+
+## License & Usage
+
+Proprietary software developed for **Giantek Consultancy Services**. All rights reserved. External cloning or copying must adhere to the contribution and usage guidelines outlined above.
